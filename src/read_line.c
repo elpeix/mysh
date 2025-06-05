@@ -1,5 +1,6 @@
 #include "read_line.h"
 #include "constants.h"
+#include "history.h"
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -7,9 +8,6 @@
 #include <termios.h>
 #include <unistd.h>
 
-char *history[MAX_HIST];
-int history_len = 0;
-int history_pos = -1;
 char line[MAX_LINE];
 int pos;
 
@@ -30,18 +28,6 @@ void active_no_canonical_mode() {
 }
 
 void restore_terminal() { tcsetattr(STDIN_FILENO, TCSANOW, &term_original); }
-
-void add_to_history(const char *input) {
-  if (history_len < MAX_HIST) {
-    history[history_len++] = strdup(input);
-  } else {
-    free(history[0]);
-    for (int i = 1; i < MAX_HIST; i++) {
-      history[i - 1] = history[i];
-    }
-    history[MAX_HIST - 1] = strdup(input);
-  }
-}
 
 void redraw_line(const char *line, int pos) {
   static int prev_len = 0;

@@ -1,13 +1,12 @@
 
+#include "parse_line.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "parse_line.h"
-
 
 char **parse_line(char *line) {
   size_t bufsize = 64;
-  char **tokens = malloc(bufsize * sizeof(char*));
+  char **tokens = malloc(bufsize * sizeof(char *));
   char *token;
   int position = 0;
 
@@ -23,7 +22,7 @@ char **parse_line(char *line) {
 
     if (position >= bufsize) {
       bufsize += 64;
-      tokens = realloc(tokens, bufsize * sizeof(char*));
+      tokens = realloc(tokens, bufsize * sizeof(char *));
 
       if (!tokens) {
         fprintf(stderr, "Allocation error\n");
