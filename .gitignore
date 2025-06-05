@@ -1,0 +1,22 @@
+# Object files
+*.o
+
+# Executables
+mysh
+test_read_line
+
+# Debugging files
+core
+vgcore.*
+
+# Editor files
+*~~
+.#*
+.DS_Store
+.vscode
+
+# Make files
+.d
+
+# Backup files
+*.bak
