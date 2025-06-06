@@ -17,24 +17,53 @@ int execute_command(char **args) {
   }
 
   if (strcmp(command, "cd") == 0) {
+    char cwd[PATH_MAX];
+
+    // Get the current working directory
+    getcwd(cwd, sizeof(cwd));
+    const char *target = NULL;
+
     if (args[1] == NULL) {
-      fprintf(stderr, "cd: missing argument\n");
-    } else {
-      // Simulate change dir
-      if (chdir(args[1]) != 0) {
-        perror("cd");
-      } else {
-        printf("Changed directory to %s\n", args[1]);
+      target = getenv("HOME");
+      if (!target) {
+        fprintf(stderr, "cd: HOME not set\n");
+        return CONTINUE;
       }
+    } else if (strcmp(args[1], "-") == 0) {
+      target = getenv("OLDPWD");
+      if (!target) {
+        fprintf(stderr, "cd: OLDPWD not set\n");
+        return CONTINUE;
+      }
+      printf("%s\n", target); // bash mostra el directori si fas cd -
+    } else {
+      target = args[1];
+    }
+
+    if (chdir(target) != 0) {
+      // If chdir fails, print an error message
+      perror("cd");
+    } else {
+      // If chdir is successful, update PWD and OLDPWD
+      setenv("OLDPWD", cwd, 1);
+      getcwd(cwd, sizeof(cwd));
+      setenv("PWD", cwd, 1);
     }
     return CONTINUE;
   }
 
   if (strcmp(command, "help") == 0) {
     printf("Available commands:\n");
-    printf("  exit - Exit the shell\n");
-    printf("  cd <directory> - Change the current directory\n");
     printf("  help - Show this help message\n");
+    printf("  mysh --version - Show the version of the shell\n");
+    printf("  exit - Exit the shell\n");
+    return CONTINUE;
+  }
+
+  if (strcmp(command, "--version") == 0 ||
+      (strcmp(command, "mysh") == 0 && args[1] &&
+       strcmp(args[1], "--version") == 0)) {
+    printf("mysh version %s\n", MYSH_VERSION);
     return CONTINUE;
   }
 
