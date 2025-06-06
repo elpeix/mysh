@@ -3,7 +3,7 @@
 
 # Executables
 mysh
-test_read_line
+test_
 
 # Debugging files
 core
@@ -20,3 +20,6 @@ vgcore.*
 
 # Backup files
 *.bak
+
+# Build directories
+build/

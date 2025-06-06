@@ -24,6 +24,10 @@ int autocomplete_in_first_word(char *line, int pos) {
   // If the position is at the start of the line, it means we are in the first
   // word.
   if (start == 0) {
+    // If the first character is a dot or a slash, we are likely in a path
+    if (line[0] == '.' || line[0] == '/') {
+      return 0;
+    }
     return 1;
   }
 

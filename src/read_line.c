@@ -271,6 +271,19 @@ char *read_line() {
         continue;
       }
 
+      // If all characters are spaces, do not autocomplete
+      int all_spaces = 1;
+      for (int i = 0; i < pos; i++) {
+        if (line[i] != ' ' && line[i] != '\t') {
+          all_spaces = 0;
+          break;
+        }
+      }
+      if (all_spaces) {
+        printf("\a"); // Beep if all characters are spaces
+        continue;
+      }
+
       int new_pos;
 
       if (autocomplete_in_first_word(line, pos) == 1) { // TODO: first word
