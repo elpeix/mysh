@@ -1,11 +1,15 @@
 #include "read_line.h"
+#include "autocomplete.h"
 #include "constants.h"
 #include "history.h"
 #include "prompt.h"
+#include <dirent.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include <termios.h>
 #include <unistd.h>
 
@@ -258,6 +262,30 @@ char *read_line() {
       pos = 0;
       line[0] = '\0';
       redraw_line(line, pos);
+
+    } else if (c == 9) { // Tab key (autocomplete)
+
+      if (pos == 0) {
+        // If the line is empty, just beep
+        printf("\a");
+        continue;
+      }
+
+      int new_pos;
+
+      if (autocomplete_in_first_word(line, pos) == 1) { // TODO: first word
+        new_pos = autocomplete_exec(line, pos);
+      } else {
+        new_pos = autocomplete_path(line, pos);
+      }
+
+      // If a completion was found, update the position and redraw the line
+      if (new_pos > 0) {
+        pos = new_pos;
+        redraw_line(line, pos);
+      } else {
+        printf("\a"); // Beep if no completion found
+      }
 
     } else if (c == '\n') { // Enter key
 

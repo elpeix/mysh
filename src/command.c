@@ -1,10 +1,12 @@
 #include "command.h"
+#include "cd_command.h"
 #include "constants.h"
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/wait.h>
 
 int execute_command(char **args) {
   if (args[0] == NULL) {
@@ -12,46 +14,18 @@ int execute_command(char **args) {
   }
   char *command = args[0];
 
+  // exit command
   if (strcmp(command, "exit") == 0) {
     return EXIT;
   }
 
+  // cd command
   if (strcmp(command, "cd") == 0) {
-    char cwd[PATH_MAX];
-
-    // Get the current working directory
-    getcwd(cwd, sizeof(cwd));
-    const char *target = NULL;
-
-    if (args[1] == NULL) {
-      target = getenv("HOME");
-      if (!target) {
-        fprintf(stderr, "cd: HOME not set\n");
-        return CONTINUE;
-      }
-    } else if (strcmp(args[1], "-") == 0) {
-      target = getenv("OLDPWD");
-      if (!target) {
-        fprintf(stderr, "cd: OLDPWD not set\n");
-        return CONTINUE;
-      }
-      printf("%s\n", target); // bash mostra el directori si fas cd -
-    } else {
-      target = args[1];
-    }
-
-    if (chdir(target) != 0) {
-      // If chdir fails, print an error message
-      perror("cd");
-    } else {
-      // If chdir is successful, update PWD and OLDPWD
-      setenv("OLDPWD", cwd, 1);
-      getcwd(cwd, sizeof(cwd));
-      setenv("PWD", cwd, 1);
-    }
+    handle_cd(args);
     return CONTINUE;
   }
 
+  // help command
   if (strcmp(command, "help") == 0) {
     printf("Available commands:\n");
     printf("  help - Show this help message\n");
@@ -60,6 +34,7 @@ int execute_command(char **args) {
     return CONTINUE;
   }
 
+  // version command
   if (strcmp(command, "--version") == 0 ||
       (strcmp(command, "mysh") == 0 && args[1] &&
        strcmp(args[1], "--version") == 0)) {

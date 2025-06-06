@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <limits.h>
 
 char *get_prompt() {
 
@@ -23,7 +24,7 @@ char *get_prompt() {
   static char prompt[PATH_MAX + 10];
 
   // Format the prompt with colors
-  snprintf(prompt, sizeof(prompt), "\033[1;32m%s\033[0m:\033[1;34m%s\033[0m$ ",
+  snprintf(prompt, sizeof(prompt), "\033[1;32m%s\033[0m:\033[1;34m%s\033[0m> ",
            "mysh", cwd);
 
   // If the prompt is too long, truncate it
