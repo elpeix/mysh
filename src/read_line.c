@@ -1,6 +1,7 @@
 #include "read_line.h"
 #include "constants.h"
 #include "history.h"
+#include "prompt.h"
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,7 +33,7 @@ void restore_terminal() { tcsetattr(STDIN_FILENO, TCSANOW, &term_original); }
 void redraw_line(const char *line, int pos) {
   static int prev_len = 0;
   int len = strlen(line);
-  int len_prompt = strlen(PROMPT);
+  int len_prompt = strlen(get_prompt());
 
   // Move the cursor to the beginning of the line
   for (int i = 0; i < prev_len + len_prompt; i++)
@@ -45,7 +46,7 @@ void redraw_line(const char *line, int pos) {
     printf("\b");
 
   // Redraw the prompt and the line
-  printf("%s%s", PROMPT, line);
+  printf("%s%s", get_prompt(), line);
 
   // If the current position is less than the length of the line, move the
   // cursor to the correct position
@@ -75,7 +76,7 @@ void clear_line(int len) {
 char *read_line() {
 
   // Print the prompt
-  printf("%s", PROMPT);
+  printf("%s", get_prompt());
   fflush(stdout); // Ensure the prompt is printed immediately
 
   // Capture ctrl+C to prevent it from terminating the program
@@ -233,7 +234,7 @@ char *read_line() {
 
       // Clear the screen and redraw the prompt
       printf("\033[H\033[J"); // Clear screen
-      printf("%s", PROMPT);
+      printf("%s", get_prompt());
       fflush(stdout);
       pos = 0;        // Reset position
       line[0] = '\0'; // Clear the line
@@ -268,10 +269,6 @@ char *read_line() {
       fflush(stdout);
       line[pos] = '\0';
       printf("\n");
-
-      if (pos > 0) {
-        add_to_history(line);
-      }
 
       // Restore terminal
       restore_terminal();

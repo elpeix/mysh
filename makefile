@@ -2,9 +2,9 @@ CC = gcc
 CFLAGS = -Wall -Wextra -g
 LDFLAGS =
 
-SRC = src/main.c src/read_line.c src/parse_line.c src/command.c src/history.c
+SRC = src/main.c src/read_line.c src/parse_line.c src/command.c src/history.c src/prompt.c
 OBJ = $(SRC:.c=.o)
-DEPS = src/read_line.h src/constants.h src/parse_line.h src/command.h src/history.h
+DEPS = src/read_line.h src/constants.h src/parse_line.h src/command.h src/history.h src/prompt.h
 
 TARGET = mysh
 

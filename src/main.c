@@ -12,6 +12,9 @@ int main() {
   char **args;
   int status;
 
+  // Load history from file
+  load_history();
+
   do {
 
     line = read_line();
@@ -19,16 +22,29 @@ int main() {
     if (line == NULL) {
       break; // Exit on EOF (Ctrl+D)
     }
+
     // save line in a buffer to access with cursor
     line_buffer = realloc(line_buffer, sizeof(char *) * 2);
 
+    // Check if realloc was successful
     if (line_buffer == NULL) {
       fprintf(stderr, "Allocation error\n");
       exit(EXIT_FAILURE);
     }
 
-    line_buffer[0] = line; // Store the current line
-    line_buffer[1] = NULL; // Null-terminate the buffer for cursor access
+    // Store the current line
+    line_buffer[0] = line;
+
+    // Ignore comments
+    if (line[0] == '#') {
+      continue;
+    }
+
+    // Add the line to history
+    add_to_history(line);
+
+    // Null-terminate the buffer for cursor access
+    line_buffer[1] = NULL;
 
     args = parse_line(line);
     status = execute_command(args);
@@ -37,8 +53,15 @@ int main() {
     free(args);
   } while (status);
 
-  free(line_buffer); // Free the line buffer if it was allocated
-  free_history();    // Free the history
+  // Free the line buffer if it was allocated
+  free(line_buffer);
+
+  // Save the history to file
+  save_history();
+
+  // Free the history
+  free_history();
+
   printf("bye\n");
 
   return 0;
