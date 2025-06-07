@@ -17,7 +17,7 @@ int alias_count = 0;
 void load_aliases() {
 
   // Load aliases from a file in the user's home directory
-  // The file is named ".mysh_alias" and should be in the format:
+  // The file is named ".mysh_aliases" and should be in the format:
   // alias name=value
   // Each alias should be on a new line.
   char path[256];
@@ -29,12 +29,11 @@ void load_aliases() {
     home = pw ? pw->pw_dir : ".";
   }
 
-  snprintf(path, sizeof(path), "%s/.mysh_alias", home);
+  snprintf(path, sizeof(path), "%s/.mysh_aliases", home);
   FILE *f = fopen(path, "r");
 
   // If the file does not exist, we simply return
   if (!f) {
-    printf("No alias file found at %s\n", path);
     return;
   }
 

@@ -17,7 +17,7 @@ Una shell minimalista en C amb funcionalitats avançades.
 - Suport per comentaris (`#`)
 - Gestió de senyals (Ctrl+C, Ctrl+D, etc.)
 - Suport per a tecles d'edició: fletxes, Ctrl+A/E/K/U/W, Supr, Home/End
-- Suport per a alias des de fitxer de configuració (`~/.mysh_alias`)
+- Suport per a alias des de fitxer de configuració (`~/.mysh_aliases`)
 
 ## Compilació
 
@@ -80,20 +80,23 @@ make
 
 ## Alias personalitzats
 
-Pots definir alias personalitzats creant un fitxer a la teva home anomenat `.mysh_alias` (fixa't que no porta la 'es' final!). Cada línia ha de tenir el format:
+Pots definir alias personalitzats creant un fitxer a la teva home anomenat
+`.mysh_aliases`. Cada línia ha de tenir el format:
 
 ```
 alias nom=ordre
 ```
 
 Exemples:
+
 ```
 alias gs=git status
 alias pull=git pull
 alias l='ls -lh'
 ```
 
-Després de crear o modificar aquest fitxer, reinicia la shell `mysh` per carregar els nous alias.
+Després de crear o modificar aquest fitxer, reinicia la shell `mysh` per
+carregar els nous alias.
 
 ## Estructura del projecte
 
