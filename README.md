@@ -78,6 +78,23 @@ make
   # Això és un comentari
   ```
 
+## Alias personalitzats
+
+Pots definir alias personalitzats creant un fitxer a la teva home anomenat `.mysh_alias` (fixa't que no porta la 'es' final!). Cada línia ha de tenir el format:
+
+```
+alias nom=ordre
+```
+
+Exemples:
+```
+alias gs=git status
+alias pull=git pull
+alias l='ls -lh'
+```
+
+Després de crear o modificar aquest fitxer, reinicia la shell `mysh` per carregar els nous alias.
+
 ## Estructura del projecte
 
 - `src/` — Codi font principal
