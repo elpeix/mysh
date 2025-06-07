@@ -1,3 +1,4 @@
+#include "alias.h"
 #include "command.h"
 #include "history.h"
 #include "parse_line.h"
@@ -14,6 +15,9 @@ int main() {
 
   // Load history from file
   load_history();
+
+  // Load aliases from file
+  load_aliases();
 
   do {
 
@@ -61,6 +65,9 @@ int main() {
 
   // Free the history
   free_history();
+
+  // Free aliases
+  free_aliases();
 
   printf("bye\n");
 

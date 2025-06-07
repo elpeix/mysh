@@ -11,5 +11,6 @@ void add_to_history(const char *input);
 void free_history(void);
 void save_history(void);
 void load_history(void);
+void print_history(void);
 
 #endif

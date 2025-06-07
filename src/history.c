@@ -99,3 +99,11 @@ void load_history() {
   }
   fclose(f);
 }
+
+void print_history() {
+  for (int i = 0; i < history_len; i++) {
+    if (history[i]) {
+      printf("%s\n", history[i]);
+    }
+  }
+}

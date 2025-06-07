@@ -1,17 +1,58 @@
 #include "command.h"
+#include "alias.h"
 #include "cd_command.h"
 #include "constants.h"
+#include "history.h"
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 #include <sys/wait.h>
+#include <unistd.h>
+
+void subsitute_command(char ***args_ptr) {
+  char **args = *args_ptr;
+
+  // Substitute the command with its alias if it exists
+  char *alias = substitute_alias(args[0]);
+  if (!alias) {
+    return;
+  }
+
+  // Split the alias into tokens and create a new args array
+  char *alias_copy = strdup(alias);
+  char *token = strtok(alias_copy, " ");
+  char **new_args = malloc(sizeof(char *) * 256);
+  int n = 0;
+
+  // Add the first token (the command itself)
+  while (token) {
+    new_args[n++] = strdup(token);
+    token = strtok(NULL, " ");
+  }
+
+  // Add the rest of the original arguments, if any
+  for (int i = 1; args[i]; i++) {
+    new_args[n++] = strdup(args[i]);
+  }
+  new_args[n] = NULL;
+
+  // Copy the new arguments back to the original args array
+  *args_ptr = new_args;
+
+  free(alias_copy);
+}
 
 int execute_command(char **args) {
   if (args[0] == NULL) {
     return CONTINUE;
   }
+  // Substitute the command with its alias if it exists
+  subsitute_command(&args);
+  if (args[0] == NULL) {
+    return CONTINUE; // If the command was substituted to NULL, do nothing
+  }
+
   char *command = args[0];
 
   // exit command
@@ -25,10 +66,17 @@ int execute_command(char **args) {
     return CONTINUE;
   }
 
+  // history command
+  if (strcmp(command, "history") == 0) {
+    print_history();
+    return CONTINUE;
+  }
+
   // help command
   if (strcmp(command, "help") == 0) {
     printf("Available commands:\n");
     printf("  help - Show this help message\n");
+    printf("  history - Show all history commands\n");
     printf("  mysh --version - Show the version of the shell\n");
     printf("  exit - Exit the shell\n");
     return CONTINUE;

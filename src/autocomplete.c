@@ -1,4 +1,5 @@
 #include "autocomplete.h"
+#include "alias.h"
 #include "constants.h"
 #include <dirent.h>
 #include <limits.h>
@@ -8,6 +9,9 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+
+// List of custom commands to autocomplete in the first word
+const char *custom_commands[] = {"cd", "help", "history", "exit", NULL};
 
 int autocomplete_in_first_word(char *line, int pos) {
   // Check if the position is at the start of the line
@@ -46,8 +50,9 @@ int autocomplete_exec(char *line, int pos) {
 
   // Get the PATH environment variable
   char *path_env = getenv("PATH");
-  if (!path_env)
+  if (!path_env) {
     return -1;
+  }
 
   char *paths = strdup(path_env);
   char *saveptr = NULL;
@@ -56,13 +61,34 @@ int autocomplete_exec(char *line, int pos) {
   char matches_arr[128][256];
   int matches = 0;
 
+  // Add custom commands to the matches array
+  for (int i = 0; custom_commands[i]; i++) {
+    if (strncmp(custom_commands[i], prefix, strlen(prefix)) == 0) {
+      strcpy(matches_arr[matches++], custom_commands[i]);
+    }
+  }
+
+  // Add aliases to the matches array
+  char *aliases = list_aliases();
+  if (aliases) {
+    char *alias = strtok(aliases, " ");
+    while (alias) {
+      if (strncmp(alias, prefix, strlen(prefix)) == 0) {
+        strcpy(matches_arr[matches++], alias);
+      }
+      alias = strtok(NULL, " ");
+    }
+    free(aliases);
+  }
+
+  // Search for matching executables in the PATH directories
   while (dir) {
     DIR *d = opendir(dir);
     if (d) {
       struct dirent *entry;
       while ((entry = readdir(d))) {
         if (strncmp(entry->d_name, prefix, strlen(prefix)) == 0) {
-          // Evita duplicats
+          // Prevent duplicates
           int duplicate = 0;
           for (int i = 0; i < matches; i++) {
             if (strcmp(matches_arr[i], entry->d_name) == 0) {
@@ -72,7 +98,6 @@ int autocomplete_exec(char *line, int pos) {
           }
           if (!duplicate && matches < 128) {
             strcpy(matches_arr[matches++], entry->d_name);
-            // printf("\n%s", entry->d_name);
           }
         }
       }
@@ -92,6 +117,7 @@ int autocomplete_exec(char *line, int pos) {
       line[pos++] = ' '; // Add a space after the command
       return pos;
     }
+
   } else if (matches > 1) {
     // Print all matches
     printf("\nPossible completions:");
@@ -180,12 +206,16 @@ int autocomplete_path(char *line, int pos) {
   if (matches == 1 && match[0]) {
     // Check if the match is a directory
     char fullpath[PATH_MAX];
+
+    // Check if the full path is too long (+1: '/' and +1: '\0')
+    if (strlen(dirpath) + 1 + strlen(match) + 1 > sizeof(fullpath)) {
+      fprintf(stderr, "Path too long for completion\n");
+      return -1;
+    }
     snprintf(fullpath, sizeof(fullpath), "%s/%s", dirpath, match);
-    int is_dir = 0;
     struct stat st;
     char last_char = ' ';
     if (stat(fullpath, &st) == 0 && S_ISDIR(st.st_mode)) {
-      is_dir = 1;
       last_char = '/'; // Add a slash if it's a directory
     }
 
@@ -197,8 +227,8 @@ int autocomplete_path(char *line, int pos) {
              strlen(match) - strlen(prefix));
       pos += strlen(match) - strlen(prefix);
 
-      line[pos++] = last_char; // Add a slash if it's a directory
-      
+      line[pos++] = last_char;
+
       return pos;
     }
   } else if (matches > 1) {
