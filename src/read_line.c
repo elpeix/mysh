@@ -39,14 +39,18 @@ void redraw_line(const char *line, int pos) {
   int len_prompt = strlen(get_prompt());
 
   // Move the cursor to the beginning of the line
-  for (int i = 0; i < prev_len + len_prompt; i++)
+  for (int i = 0; i < prev_len + len_prompt; i++) {
     printf("\b");
+  }
 
   // Clear the line
-  for (int i = 0; i < prev_len + len_prompt; i++)
+  for (int i = 0; i < prev_len + len_prompt; i++) {
     printf(" ");
-  for (int i = 0; i < prev_len + len_prompt; i++)
+  }
+
+  for (int i = 0; i < prev_len + len_prompt; i++) {
     printf("\b");
+  }
 
   // Redraw the prompt and the line
   printf("%s%s", get_prompt(), line);
@@ -54,15 +58,21 @@ void redraw_line(const char *line, int pos) {
   // If the current position is less than the length of the line, move the
   // cursor to the correct position
   if (prev_len > len) {
-    for (int i = 0; i < prev_len - len; i++)
+
+    for (int i = 0; i < prev_len - len; i++) {
       printf(" ");
-    for (int i = 0; i < prev_len - len; i++)
+    }
+
+    for (int i = 0; i < prev_len - len; i++) {
       printf("\b");
+    }
   }
 
   // Move the cursor to the correct position
-  for (int i = 0; i < len - pos; i++)
+  for (int i = 0; i < len - pos; i++) {
     printf("\b");
+  }
+
   fflush(stdout);
 
   // Update the previous length
@@ -73,6 +83,7 @@ void clear_line(int len) {
   for (int i = 0; i < len; i++) {
     printf("\b \b"); // Move back and clear the character
   }
+
   fflush(stdout);
 }
 

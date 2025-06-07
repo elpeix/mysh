@@ -4,18 +4,25 @@
 #include <stdlib.h>
 #include <string.h>
 
-char clear_comments(char *line) {
+void clear_comments(char *line) {
+
   if (line == NULL) {
     fprintf(stderr, "Error: NULL line passed to clear_comments\n");
-    return '\0';
+    return;
   }
 
+  // Find the first occurrence of '#' in the line
   char *comment_pos = strchr(line, '#');
   if (comment_pos != NULL) {
     *comment_pos = '\0'; // Replace '#' with null terminator
   }
 
-  return *line; // Return the modified line
+  // Remove trailing whitespace from the line
+  size_t len = strlen(line);
+  while (len > 0 && (line[len - 1] == ' ' || line[len - 1] == '\t')) {
+    line[len - 1] = '\0'; // Replace trailing whitespace with null terminator
+    len--;
+  }
 }
 
 char **parse_line(char *line) {
@@ -29,26 +36,33 @@ char **parse_line(char *line) {
   char *token;
   int position = 0;
 
+  // Check if memory allocation was successful
   if (!tokens) {
     fprintf(stderr, "Allocation error\n");
     exit(EXIT_FAILURE);
   }
 
+  // Use strtok to split the line into tokens
   token = strtok(line, " \n");
 
+  // Loop through the tokens and add them to the array
   while (token != NULL) {
     tokens[position++] = token;
 
+    // If we have more tokens than the buffer size, reallocate memory
     if (position >= bufsize) {
       bufsize += 64;
       tokens = realloc(tokens, bufsize * sizeof(char *));
 
+      // Check if memory reallocation was successful
       if (!tokens) {
         fprintf(stderr, "Allocation error\n");
         exit(EXIT_FAILURE);
       }
     }
 
+    // Retrieves the next token from the input string, using space and newline
+    // as delimiters.
     token = strtok(NULL, " \n");
   }
 

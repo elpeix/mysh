@@ -42,8 +42,9 @@ int autocomplete_in_first_word(char *line, int pos) {
 int autocomplete_exec(char *line, int pos) {
   // Find the beginning of the word
   int start = pos - 1;
-  while (start >= 0 && line[start] != ' ')
+  while (start >= 0 && line[start] != ' ') {
     start--;
+  }
   start++;
   char prefix[256] = {0};
   strncpy(prefix, line + start, pos - start);
@@ -130,8 +131,9 @@ int autocomplete_exec(char *line, int pos) {
     int done = 0;
     while (!done) {
       char current_char = matches_arr[0][common_length];
-      if (current_char == '\0')
+      if (current_char == '\0') {
         break;
+      }
       for (int i = 1; i < matches; i++) {
         if (matches_arr[i][common_length] != current_char) {
           current_char = 0;
@@ -161,8 +163,9 @@ int autocomplete_exec(char *line, int pos) {
 int autocomplete_path(char *line, int pos) {
   // Find the beginning of the word
   int start = pos - 1;
-  while (start >= 0 && line[start] != ' ' && line[start] != '/')
+  while (start >= 0 && line[start] != ' ' && line[start] != '/') {
     start--;
+  }
   start++;
   char prefix[256] = {0};
   strncpy(prefix, line + start, pos - start);
@@ -170,8 +173,9 @@ int autocomplete_path(char *line, int pos) {
   // Search for matching files in the current directory
   char dirpath[PATH_MAX] = ".";
   int slash = start - 1;
-  while (slash >= 0 && line[slash] != ' ')
+  while (slash >= 0 && line[slash] != ' ') {
     slash--;
+  }
   if (slash + 1 < start) {
     strncpy(dirpath, line + slash + 1, start - slash - 1);
     dirpath[start - slash - 1] = '\0';
