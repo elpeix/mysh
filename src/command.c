@@ -1,6 +1,7 @@
 #include "command.h"
 #include "alias.h"
 #include "cd_command.h"
+#include "pipe_commands.h"
 #include "constants.h"
 #include "history.h"
 #include <fcntl.h>
@@ -91,50 +92,15 @@ int execute_command(char **args) {
   }
 
   // Pipe command execution
-  int pipe_pos = -1;
-  for (int i = 0; args[i] != NULL; i++) {
-    if (strcmp(args[i], "|") == 0) {
-      pipe_pos = i;
-      break;
+  if (is_pipe_command(args)) {
+    int result_pipe_command = execute_pipe_command(args);
+    if (result_pipe_command == -1) {
+      perror("Pipe command execution failed");
+      return CONTINUE;
     }
-  }
-
-  if (pipe_pos != -1) {
-    // Split the arguments into two parts at the pipe position
-    args[pipe_pos] = NULL;
-    char **left = args;
-    char **right = &args[pipe_pos + 1];
-
-    // Create a pipe
-    int fd[2];
-    pipe(fd);
-
-    // First child process. Write to the pipe
-    if (fork() == 0) {
-      dup2(fd[1], STDOUT_FILENO);
-      close(fd[0]);
-      close(fd[1]);
-      execvp(left[0], left);
-      perror("execvp");
-      exit(1);
+    if (result_pipe_command == 1) {
+      return CONTINUE; // Pipe command executed successfully
     }
-
-    // Second child process. This will read from the pipe
-    if (fork() == 0) {
-      dup2(fd[0], STDIN_FILENO);
-      close(fd[0]);
-      close(fd[1]);
-      execvp(right[0], right);
-      perror("execvp");
-      exit(1);
-    }
-
-    // Parent process. Close the pipe and wait for children
-    close(fd[0]);
-    close(fd[1]);
-    wait(NULL);
-    wait(NULL);
-    return CONTINUE;
   }
 
   // Background command execution

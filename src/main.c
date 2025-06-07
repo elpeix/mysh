@@ -50,6 +50,9 @@ int main() {
     // Null-terminate the buffer for cursor access
     line_buffer[1] = NULL;
 
+    // Clear comments
+    clear_comments(line);
+
     args = parse_line(line);
     status = execute_command(args);
 

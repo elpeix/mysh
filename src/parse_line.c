@@ -4,7 +4,26 @@
 #include <stdlib.h>
 #include <string.h>
 
+char clear_comments(char *line) {
+  if (line == NULL) {
+    fprintf(stderr, "Error: NULL line passed to clear_comments\n");
+    return '\0';
+  }
+
+  char *comment_pos = strchr(line, '#');
+  if (comment_pos != NULL) {
+    *comment_pos = '\0'; // Replace '#' with null terminator
+  }
+
+  return *line; // Return the modified line
+}
+
 char **parse_line(char *line) {
+  if (line == NULL) {
+    fprintf(stderr, "Error: NULL line passed to parse_line\n");
+    return NULL;
+  }
+
   size_t bufsize = 64;
   char **tokens = malloc(bufsize * sizeof(char *));
   char *token;
