@@ -17,7 +17,7 @@ Una shell minimalista en C amb funcionalitats avançades.
 - Suport per comentaris (`#`)
 - Gestió de senyals (Ctrl+C, Ctrl+D, etc.)
 - Suport per a tecles d'edició: fletxes, Ctrl+A/E/K/U/W, Supr, Home/End
-- Suport per a alias des de fitxer de configuració (`~/.mysh_aliases`)
+- Suport per a alias des de fitxer de configuració (`~/.mysh_alias`)
 
 ## Compilació
 
