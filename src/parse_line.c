@@ -39,7 +39,7 @@ char **parse_line(char *line) {
   // Check if memory allocation was successful
   if (!tokens) {
     fprintf(stderr, "Allocation error\n");
-    exit(EXIT_FAILURE);
+    return NULL;
   }
 
   // Use strtok to split the line into tokens
@@ -57,7 +57,7 @@ char **parse_line(char *line) {
       // Check if memory reallocation was successful
       if (!tokens) {
         fprintf(stderr, "Allocation error\n");
-        exit(EXIT_FAILURE);
+        return NULL;
       }
     }
 

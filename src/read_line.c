@@ -12,9 +12,6 @@
 #include <termios.h>
 #include <unistd.h>
 
-char line[MAX_LINE];
-int pos;
-
 volatile sig_atomic_t ctrl_c_pressed = 0;
 struct termios term_original;
 
@@ -88,6 +85,8 @@ void clear_line(int len) {
 }
 
 char *read_line() {
+  char line[MAX_LINE];
+  int pos;
 
   // Print the prompt
   printf("%s", get_prompt());
@@ -242,7 +241,7 @@ char *read_line() {
       // Restore default signal handler for Ctrl+C
       sigaction(SIGINT, &old_sa, NULL);
 
-      return "exit"; // Indicate EOF
+      return NULL; // Indicate EOF
 
     } else if (c == 12) { // Ctrl+L (clear screen)
 
@@ -327,7 +326,12 @@ char *read_line() {
       // Restore default signal handler for Ctrl+C
       sigaction(SIGINT, &old_sa, NULL);
 
-      return line;
+      char *response = strdup(line);
+      if (response == NULL) {
+        perror("strdup");
+        return NULL; // Return NULL on memory allocation failure
+      }
+      return response;
 
     } else if (c == 127 || c == 8) { // Backspace
 
