@@ -4,13 +4,13 @@ LDFLAGS =
 
 SRC = src/main.c src/read_line.c src/parse_line.c src/command.c src/history.c \
 			src/prompt.c src/cd_command.c src/autocomplete.c src/alias.c \
-      src/pipe_commands.c
+      src/pipe_commands.c src/utils.c
 
 OBJ = $(SRC:src/%.c=build/%.o)
 
 DEPS = src/read_line.h src/constants.h src/parse_line.h src/command.h \
 			 src/history.h src/prompt.h src/cd_command.h src/autocomplete.h \
-       src/alias.h src/pipe_commands.h
+       src/alias.h src/pipe_commands.h src/utils.h
 
 TARGET = mysh
 

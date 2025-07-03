@@ -3,7 +3,7 @@
 
 void load_aliases();
 char *list_aliases();
-char *substitute_alias(const char *command);
+int subsitute_command(char ***args_ptr);
 void free_aliases();
 
 #endif

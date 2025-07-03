@@ -43,7 +43,6 @@ int main() {
 
     status = execute_command(args);
 
-    free(args);
     free(line);
   } while (status);
 

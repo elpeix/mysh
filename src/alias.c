@@ -107,3 +107,42 @@ void free_aliases() {
   }
   alias_count = 0; // Reset the alias count
 }
+
+int subsitute_command(char ***args_ptr) {
+  char **args = *args_ptr;
+
+  // Substitute the command with its alias if it exists
+  char *alias = substitute_alias(args[0]);
+  if (!alias) {
+    return 0;
+  }
+
+  // Split the alias into tokens and create a new args array
+  char *alias_copy = strdup(alias);
+  char *token = strtok(alias_copy, " ");
+  char **new_args = malloc(sizeof(char *) * 256);
+  int n = 0;
+
+  // Add the first token (the command itself)
+  while (token) {
+    new_args[n++] = strdup(token);
+    token = strtok(NULL, " ");
+  }
+
+  // Add the rest of the original arguments, if any
+  for (int i = 1; args[i]; i++) {
+    free(args[i]); // Free the old argument
+    new_args[n++] = strdup(args[i]);
+  }
+  new_args[n] = NULL;
+
+  // Free the old args array
+  free(args);
+
+  // Copy the new arguments back to the original args array
+  *args_ptr = new_args;
+
+  free(alias_copy);
+
+  return 1;
+}

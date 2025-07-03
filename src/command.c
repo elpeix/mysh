@@ -4,6 +4,7 @@
 #include "pipe_commands.h"
 #include "constants.h"
 #include "history.h"
+#include "utils.h"
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,66 +12,68 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-void subsitute_command(char ***args_ptr) {
-  char **args = *args_ptr;
-
-  // Substitute the command with its alias if it exists
-  char *alias = substitute_alias(args[0]);
-  if (!alias) {
-    return;
+int return_free_args(char **args, int subsituted) {
+  if (subsituted) {
+    for (int i = 0; args[i]; i++) {
+      free(args[i]);
+    }
   }
-
-  // Split the alias into tokens and create a new args array
-  char *alias_copy = strdup(alias);
-  char *token = strtok(alias_copy, " ");
-  char **new_args = malloc(sizeof(char *) * 256);
-  int n = 0;
-
-  // Add the first token (the command itself)
-  while (token) {
-    new_args[n++] = strdup(token);
-    token = strtok(NULL, " ");
-  }
-
-  // Add the rest of the original arguments, if any
-  for (int i = 1; args[i]; i++) {
-    new_args[n++] = strdup(args[i]);
-  }
-  new_args[n] = NULL;
-
-  // Copy the new arguments back to the original args array
-  *args_ptr = new_args;
-
-  free(alias_copy);
+  free(args);
+  return CONTINUE;
 }
 
 int execute_command(char **args) {
-  if (args[0] == NULL) {
-    return CONTINUE;
+  if (args == NULL || args[0] == NULL) {
+    return return_free_args(args, 0);
   }
+
+  // Split commands with semicolons
+  for (int i = 0; args[i]; i++) {
+    if (strcmp(args[i], ";") == 0) {
+
+      // Split the command at the semicolon
+      args[i] = NULL;
+
+      // Execute the command before the semicolon
+      if (args[0] != NULL) {
+        char **command_args = copy_args(args);
+        execute_command(command_args);
+      }
+
+      // Execute the rest of the commands
+      if (args[i + 1] != NULL) {
+        char **next_args = copy_args(&args[i + 1]);
+        execute_command(next_args);
+      }
+
+      return CONTINUE;
+    }
+  }
+
   // Substitute the command with its alias if it exists
-  subsitute_command(&args);
+  int subsituted = subsitute_command(&args);
   if (args[0] == NULL) {
-    return CONTINUE; // If the command was substituted to NULL, do nothing
+    free_args(args, subsituted);
+    return CONTINUE;
   }
 
   char *command = args[0];
 
   // exit command
   if (strcmp(command, "exit") == 0) {
-    return EXIT;
+    return return_free_args(args, subsituted);
   }
 
   // cd command
   if (strcmp(command, "cd") == 0) {
     handle_cd(args);
-    return CONTINUE;
+    return return_free_args(args, subsituted);
   }
 
   // history command
   if (strcmp(command, "history") == 0) {
     print_history();
-    return CONTINUE;
+    return return_free_args(args, subsituted);
   }
 
   // help command
@@ -80,7 +83,7 @@ int execute_command(char **args) {
     printf("  history - Show all history commands\n");
     printf("  mysh --version - Show the version of the shell\n");
     printf("  exit - Exit the shell\n");
-    return CONTINUE;
+    return return_free_args(args, subsituted);
   }
 
   // version command
@@ -88,7 +91,7 @@ int execute_command(char **args) {
       (strcmp(command, "mysh") == 0 && args[1] &&
        strcmp(args[1], "--version") == 0)) {
     printf("mysh version %s\n", MYSH_VERSION);
-    return CONTINUE;
+    return return_free_args(args, subsituted);
   }
 
   // Pipe command execution
@@ -96,10 +99,10 @@ int execute_command(char **args) {
     int result_pipe_command = execute_pipe_command(args);
     if (result_pipe_command == -1) {
       perror("Pipe command execution failed");
-      return CONTINUE;
+      return return_free_args(args, subsituted);
     }
     if (result_pipe_command == 1) {
-      return CONTINUE; // Pipe command executed successfully
+      return return_free_args(args, subsituted); // Pipe command executed successfully
     }
   }
 
@@ -159,8 +162,8 @@ int execute_command(char **args) {
     } else {
       printf("Command running in background with PID: %d\n", pid);
     }
-    return CONTINUE;
+    return return_free_args(args, subsituted);
   }
   perror("fork");
-  return CONTINUE;
+  return return_free_args(args, subsituted);
 }

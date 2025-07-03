@@ -9,6 +9,7 @@ Una shell minimalista en C amb funcionalitats avançades.
 - Pipes (`|`)
 - Redirecció d'entrada i sortida (`<`, `>`)
 - Execució en background (`&`)
+- Comandes separades per punt i coma (`;`)
 - Autocompletat de fitxers i comandes amb Tab (inclou barra per directoris i
   prefix comú)
 - Comandes internes: `cd` (amb suport per `cd`, `cd -` i actualització

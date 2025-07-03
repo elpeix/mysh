@@ -25,16 +25,35 @@ void clear_comments(char *line) {
   }
 }
 
+void insert_spaces_around_semicolons(char *line) {
+  char buffer[1024];
+  int j = 0;
+  for (int i = 0; line[i] != '\0'; i++) {
+    if (line[i] == ';') {
+      buffer[j++] = ' ';
+      buffer[j++] = ';';
+      buffer[j++] = ' ';
+    } else {
+      buffer[j++] = line[i];
+    }
+  }
+  buffer[j] = '\0';
+  strcpy(line, buffer);
+}
+
 char **parse_line(char *line) {
   if (line == NULL) {
     fprintf(stderr, "Error: NULL line passed to parse_line\n");
     return NULL;
   }
 
+  // Insert spaces around semicolons to ensure proper tokenization
+  insert_spaces_around_semicolons(line);
+
   size_t bufsize = 64;
   char **tokens = malloc(bufsize * sizeof(char *));
   char *token;
-  int position = 0;
+  size_t position = 0;
 
   // Check if memory allocation was successful
   if (!tokens) {

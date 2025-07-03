@@ -127,7 +127,7 @@ int autocomplete_exec(char *line, int pos) {
     }
 
     // Check for the longest common prefix
-    int common_length = strlen(prefix);
+    size_t common_length = strlen(prefix);
     int done = 0;
     while (!done) {
       char current_char = matches_arr[0][common_length];
@@ -243,7 +243,7 @@ int autocomplete_path(char *line, int pos) {
     }
 
     // Find the longest common prefix
-    int common_length = strlen(prefix);
+    size_t common_length = strlen(prefix);
     int done = 0;
     while (!done) {
       // Store the current matches in the array
