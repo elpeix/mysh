@@ -86,7 +86,7 @@ void clear_line(int len) {
 
 char *read_line() {
   char line[MAX_LINE];
-  int pos;
+  size_t pos;
 
   // Print the prompt
   printf("%s", get_prompt());
@@ -255,9 +255,9 @@ char *read_line() {
     } else if (c == 11) { // Ctrl+K (clear to end of line)
 
       // Clear from the current position to the end of the line
-      int len = strlen(line);
+      size_t len = strlen(line);
       if (pos < len) {
-        for (int i = pos; i < len; i++) {
+        for (size_t i = pos; i < len; i++) {
           printf("\b \b"); // Move back and clear the character
         }
         line[pos] = '\0'; // Null-terminate the string
@@ -282,7 +282,7 @@ char *read_line() {
 
       // If all characters are spaces, do not autocomplete
       int all_spaces = 1;
-      for (int i = 0; i < pos; i++) {
+      for (size_t i = 0; i < pos; i++) {
         if (line[i] != ' ' && line[i] != '\t') {
           all_spaces = 0;
           break;
@@ -345,7 +345,7 @@ char *read_line() {
     } else if (pos < MAX_LINE - 1) {
 
       // Insert character at current position
-      int len = strlen(line);
+      size_t len = strlen(line);
       if (pos < len) {
         // Move the rest of the line to the right
         memmove(line + pos + 1, line + pos, len - pos + 1);
