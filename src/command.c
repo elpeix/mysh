@@ -61,7 +61,8 @@ int execute_command(char **args) {
 
   // exit command
   if (strcmp(command, "exit") == 0) {
-    return return_free_args(args, subsituted);
+    free_args(args, subsituted);
+    exit(0);
   }
 
   // cd command
